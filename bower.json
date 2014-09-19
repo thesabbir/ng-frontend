@@ -1,0 +1,32 @@
+{
+    "name": "frontend",
+    "version": "0.1.0",
+    "description": "TODO",
+    "authors": [
+        "Sabbir Ahmed"
+    ],
+    "license": "MIT",
+    "private": true,
+    "ignore": [
+        "**/.*",
+        "package.json",
+        "gulpfile.js",
+        "node_modules",
+        "bower_components",
+        "src",
+        "dist"
+    ],
+    "dependencies": {
+        "angular": "~1.2.24",
+        "angular-animate": "~1.2.24",
+        "angular-cookies": "~1.2.24",
+        "angular-translate": "~2.2.0",
+        "angular-ui-router": "~0.2.11",
+        "ngstorage": "~0.3.0",
+        "angular-bootstrap": "~0.11.0",
+        "angular-ui-utils": "~0.1.1",
+        "font-awesome": "~4.2.0",
+        "bootstrap": "~3.2.0"
+
+    }
+}
