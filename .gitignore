@@ -2,8 +2,8 @@ node_modules/
 bower_components/
 .tmp/
 .idea/
-src/vendors/js/**/
-src/vendors/css/**/
-src/vendors/fonts/**/
+src/vendors/js/*
+src/vendors/css/*
+src/vendors/fonts/*
 src/styles/*.css
 dist/

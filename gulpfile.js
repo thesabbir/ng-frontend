@@ -1,23 +1,23 @@
 'use strict';
 var gulp = require('gulp'),
-    server = require('gulp-webserver'),
-    uglify = require('gulp-uglify'),
-    concat = require('gulp-concat'),
-    minifycss = require('gulp-minify-css'),
-    prefixer = require('gulp-autoprefixer'),
-    stylus = require('gulp-stylus'),
-    inject = require("gulp-inject"),
-    angularFilesort = require('gulp-angular-filesort'),
-    htmlmin = require('gulp-htmlmin'),
-    rimraf = require('gulp-rimraf'),
-    nib = require('nib'),
-    bowerFiles = require('main-bower-files'),
-    ngAnnotate = require('gulp-ng-annotate');
+  server = require('gulp-webserver'),
+  uglify = require('gulp-uglify'),
+  concat = require('gulp-concat'),
+  minifycss = require('gulp-minify-css'),
+  prefixer = require('gulp-autoprefixer'),
+  stylus = require('gulp-stylus'),
+  inject = require("gulp-inject"),
+  angularFilesort = require('gulp-angular-filesort'),
+  htmlmin = require('gulp-htmlmin'),
+  rimraf = require('gulp-rimraf'),
+  nib = require('nib'),
+  bowerFiles = require('main-bower-files'),
+  ngAnnotate = require('gulp-ng-annotate');
 
 
 function fileTypeFilter(files, extension) {
-    var regExp = new RegExp('\\.' + extension + '$');
-    return files.filter(regExp.test.bind(regExp));
+  var regExp = new RegExp('\\.' + extension + '$');
+  return files.filter(regExp.test.bind(regExp));
 }
 
 /*
@@ -32,7 +32,7 @@ gulp.task('clean-dist', function () {
     .pipe(rimraf());
 });
 
-gulp.task('clean-vendors',  function () {
+gulp.task('clean-vendors', function () {
   return gulp.src([
     './src/vendors/css/*.css',
     './src/vendors/js/*.js',
@@ -50,7 +50,7 @@ gulp.task('clean', ['clean-css', 'clean-dist', 'clean-vendors']);
  */
 
 gulp.task('watch', function () {
-    gulp.watch('./src/styles/**/*.styl', ['build-styl']);
+  gulp.watch('./src/styles/**/*.styl', ['build-styl']);
 });
 
 /*
@@ -58,58 +58,58 @@ gulp.task('watch', function () {
  * */
 
 gulp.task('build-stylus', ['clean-css'], function () {
-    return gulp.src(['./src/styles/app.styl'])
-        .pipe(stylus({use: nib()}))
-        .pipe(prefixer('last 15 version'))
-        .pipe(gulp.dest('./src/styles'));
+  return gulp.src(['./src/styles/app.styl'])
+    .pipe(stylus({use: nib()}))
+    .pipe(prefixer('last 15 version'))
+    .pipe(gulp.dest('./src/styles'));
 });
 
 
 gulp.task('vendors-css', ['clean-vendors'], function () {
-    var vendorsCss = fileTypeFilter(bowerFiles(), 'css');
-    if (vendorsCss.length) {
-        return gulp.src(vendorsCss)
-            .pipe(gulp.dest('./src/vendors/css'));
-    }
+  var vendorsCss = fileTypeFilter(bowerFiles(), 'css');
+  if (vendorsCss.length) {
+    return gulp.src(vendorsCss)
+      .pipe(gulp.dest('./src/vendors/css'));
+  }
 });
 
 gulp.task('vendors-js', ['clean-vendors'], function () {
-    var vendorsJS = fileTypeFilter(bowerFiles(), 'js');
-    if (vendorsJS.length) {
-        return gulp.src(vendorsJS)
-            .pipe(gulp.dest('./src/vendors/js'));
-    }
+  var vendorsJS = fileTypeFilter(bowerFiles(), 'js');
+  if (vendorsJS.length) {
+    return gulp.src(vendorsJS)
+      .pipe(gulp.dest('./src/vendors/js'));
+  }
 });
 
 gulp.task('vendors-fonts', ['clean-vendors'], function () {
-    var vendorsFonts = fileTypeFilter(bowerFiles(), '(eot|svg|ttf|woff)');
-    if (vendorsFonts.length) {
-        return gulp.src(vendorsFonts)
-            .pipe(gulp.dest('./src/vendors/fonts'));
-    }
+  var vendorsFonts = fileTypeFilter(bowerFiles(), '(eot|svg|ttf|woff)');
+  if (vendorsFonts.length) {
+    return gulp.src(vendorsFonts)
+      .pipe(gulp.dest('./src/vendors/fonts'));
+  }
 
 });
 
-function index() {
-    var vendorFiles = gulp.src([
-        './src/vendors/js/angular.js',
-        './src/vendors/js/jquery.js',
-        './src/vendors/js/*.js',
-        './src/vendors/css/*.css'
-    ], {read: false});
+function buildInject() {
+  var vendorsFiles = gulp.src([
+    './src/vendors/js/angular.js',
+    './src/vendors/js/jquery.js',
+    './src/vendors/js/*.js',
+    './src/vendors/css/*.css'
+  ], {read: false});
 
-    var angularFiles = gulp.src('./src/js/**/*.js').
-        pipe(angularFilesort());
+  var angularFiles = gulp.src('./src/js/**/*.js').
+    pipe(angularFilesort());
 
-    var styles = gulp.src([
-        './src/styles/*.css'
-    ], {read: false});
+  var appStyles = gulp.src([
+    './src/styles/*.css'
+  ], {read: false});
 
-    gulp.src('./src/index.html')
-        .pipe(inject(styles, {ignorePath: 'src'}))
-        .pipe(inject(angularFiles, {ignorePath: 'src'}))
-        .pipe(inject(vendorFiles, { starttag: '<!-- inject:vendor:{{ext}} -->', ignorePath: 'src' }))
-        .pipe(gulp.dest('./src'));
+  gulp.src('./src/index.html')
+    .pipe(inject(appStyles, {ignorePath: 'src'}))
+    .pipe(inject(angularFiles, {ignorePath: 'src'}))
+    .pipe(inject(vendorsFiles, { starttag: '<!-- inject:vendor:{{ext}} -->', ignorePath: 'src' }))
+    .pipe(gulp.dest('./src'));
 }
 
 gulp.task('build-vendors', ['vendors-css', 'vendors-js', 'vendors-fonts'])
@@ -117,75 +117,99 @@ gulp.task('build-css', ['build-stylus']);
 
 //Build Task
 gulp.task('build', ['build-css', 'build-vendors'], function () {
-    index();
+  buildInject();
 });
 
 /*
  * Dist Task Start
  */
 gulp.task('dist-vendors-css', ['vendors-css'], function () {
-    return gulp.src(['./src/vendors/css/*.css'])
-        .pipe(minifycss())
-        .pipe(concat('vendors.min.css'))
-        .pipe(gulp.dest('./dist/css'));
+  return gulp.src(['./src/vendors/css/*.css'])
+    .pipe(minifycss())
+    .pipe(concat('vendors.min.css'))
+    .pipe(gulp.dest('./dist/css'));
 });
 
 gulp.task('dist-vendors-js', ['vendors-js'], function () {
-    return gulp.src([
-        './src/vendors/js/angular.js',
-        './src/vendors/js/jquery.js',
-        './src/vendors/js/*.js'
-    ])
-        .pipe(uglify())
-        .pipe(concat('vendors.min.js'))
-        .pipe(gulp.dest('./dist/js'));
+  return gulp.src([
+    './src/vendors/js/angular.js',
+    './src/vendors/js/jquery.js',
+    './src/vendors/js/*.js'
+  ])
+    .pipe(uglify())
+    .pipe(concat('vendors.min.js'))
+    .pipe(gulp.dest('./dist/js'));
 });
 
 gulp.task('dist-vendors-fonts', ['vendors-fonts'], function () {
-    gulp.src(['./src/vendors/fonts/*'])
-        .pipe(gulp.dest('./dist/fonts'));
+  gulp.src(['./src/vendors/fonts/*'])
+    .pipe(gulp.dest('./dist/fonts'));
 });
 
 gulp.task('dist-css', ['build-css'], function () {
-    return gulp.src(['./src/styles/*.css'])
-        .pipe(minifycss())
-        .pipe(concat('styles.min.css'))
-        .pipe(gulp.dest('./dist/css'));
+  return gulp.src(['./src/styles/*.css'])
+    .pipe(minifycss())
+    .pipe(concat('styles.min.css'))
+    .pipe(gulp.dest('./dist/css'));
 });
 
 gulp.task('dist-js', function () {
-    return gulp.src([
-        './src/js/app.js',
-        './src/js/**/*.js'
-    ])  .pipe(ngAnnotate())
-        .pipe(uglify())
-        .pipe(concat('scripts.min.js'))
-        .pipe(gulp.dest('./dist/js'));
+  return gulp.src([
+    './src/js/app.js',
+    './src/js/**/*.js'
+  ]).pipe(ngAnnotate())
+    .pipe(uglify())
+    .pipe(concat('scripts.min.js'))
+    .pipe(gulp.dest('./dist/js'));
 });
 
 
 gulp.task('dist-templates', function () {
-    gulp.src(['./src/templates/**/*.html'])
-        .pipe(htmlmin({
-            removeComments: true,
-            collapseWhitespace: true,
-            removeEmptyAttributes: false,
-            collapseBooleanAttributes: true,
-            removeRedundantAttributes: true
-        }))
-        .pipe(gulp.dest('./dist/tpl'));
+  gulp.src(['./src/templates/**/*.html'])
+    .pipe(htmlmin({
+      removeComments: true,
+      collapseWhitespace: true,
+      removeEmptyAttributes: false,
+      collapseBooleanAttributes: true,
+      removeRedundantAttributes: true
+    }))
+    .pipe(gulp.dest('./dist/tpl'));
 });
 
 gulp.task('dist-assets', function () {
-    gulp.src(['./src/assets/*'])
-        .pipe(gulp.dest('./dist/assets'));
+  gulp.src(['./src/assets/*'])
+    .pipe(gulp.dest('./dist/assets'));
 });
 
+function distInject() {
+  var vendorsFiles = gulp.src([
+    './dist/js/vendors.min.js',
+    './dist/css/vendors.min.css'
+  ], {read: false});
+
+
+  var appFiles = gulp.src([
+    './dist/js/scripts.min.js',
+    './dist/css/styles.min.css'
+  ], {read: false});
+
+  gulp.src('./src/index.html')
+    .pipe(inject(appFiles, {ignorePath: 'dist'}))
+    .pipe(inject(vendorsFiles, { starttag: '<!-- inject:vendor:{{ext}} -->', ignorePath: 'dist' }))
+    .pipe(htmlmin({
+      removeComments: true,
+      collapseWhitespace: true,
+      removeEmptyAttributes: false,
+      collapseBooleanAttributes: true,
+      removeRedundantAttributes: true
+    }))
+    .pipe(gulp.dest('./dist'));
+}
 
 gulp.task('dist-vendors-files', ['dist-vendors-js', 'dist-vendors-css', 'dist-vendors-fonts']);
 
 gulp.task('dist', ['dist-vendors-files', 'dist-js', 'dist-css', 'dist-templates', 'dist-assets'], function () {
-distInject();
+  distInject();
 });
 
 
@@ -196,19 +220,19 @@ distInject();
 
 
 gulp.task('serve', ['build', 'watch'], function () {
-    gulp.src('src')
-        .pipe(server({
-            livereload: true,
-            open: true
-        }));
+  gulp.src('src')
+    .pipe(server({
+      livereload: true,
+      open: true
+    }));
 });
 
 gulp.task('serve:dist', ['dist'], function () {
-    gulp.src('dist')
-        .pipe(server({
-            livereload: true,
-            open: true
-        }));
+  gulp.src('dist')
+    .pipe(server({
+      livereload: true,
+      open: true
+    }));
 });
 
 /*
